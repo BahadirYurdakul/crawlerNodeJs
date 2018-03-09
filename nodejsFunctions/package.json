@@ -1,0 +1,24 @@
+{
+  "name": "nodejsFunctions",
+  "version": "0.0.1",
+  "dependencies": {
+    "@google-cloud/storage": "^1.6.0",
+    "@google-cloud/datastore": "^1.3.4",
+    "@google-cloud/pubsub": "^0.16.4",
+    "request-promise-native": "^1.0.5",
+    "flow-bin": "^0.59.0",
+    "linkscrape": "^1.0.0",
+    "request": "^2.83.0",
+    "jszip": "^3.1.5",
+    "url": "^0.11.0"
+  },
+  "scripts": {
+    "publish": "babel src/ -d ./out && cp src/config.json out/config.json && cp package.json out/package.json && gcloud alpha functions deploy crawler --source out/",
+    "postpublish": "rm -r out/"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0"
+  }
+}

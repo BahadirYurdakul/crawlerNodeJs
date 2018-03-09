@@ -1,0 +1,11 @@
+{
+	"googleCloudProjectId": "crawlerNode",
+	"storageBucketName": "crawler_bucket",
+	"pubsubTopicName": "messageSearchWebsite",
+	"datastoreKind": "websiteLinks",
+	"pubSubBatchingOptions" : {
+		"maxMessages": "50",
+		"maxMilliseconds": "10000"
+	},
+	"googleCloudEventMaxAgeMs": 100000
+}
