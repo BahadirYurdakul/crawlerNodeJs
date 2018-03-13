@@ -2,23 +2,21 @@
 
 import {UrlHelper} from "./UrlHelper";
 const linkscrape = require('linkscrape');
-import {CustomUrlModel} from "../utils/CustomUrlModel";
 
 
-export function scrapeLinks(customParentUrl : CustomUrlModel, rawHtml : string) : Promise<*> {
+export function scrapeLinks(parentUrl: string, rawHtml : string) : Promise<*> {
     return new Promise((resolve) => {
-        linkscrape(customParentUrl.protocolHostPathname, rawHtml, function (links) {
-            let sameDomainParsedUrlsMap = new Map();
-            links.forEach(link => {
-                try {
-                    let childCustomUrl = UrlHelper.normalizeChildUrl(customParentUrl, link);
-                    sameDomainParsedUrlsMap.set(childCustomUrl.hostPathname, childCustomUrl);
-                } catch (err) {
-                    console.error(`Child link not added at linkscrape. ChildLink: ${link.href}
-                    , ParentLink: ${customParentUrl.hostPathname}, err: ${err}`);
+        linkscrape(parentUrl, rawHtml, function (links) {
+            console.log("Now linkscrape parentUrl is " + parentUrl);
+            const childUrlSet = new Set();
+            links.forEach(scrapedLink => {
+                if (scrapedLink.link && UrlHelper.isUrlValid(scrapedLink.link)) {
+                    childUrlSet.add(scrapedLink.link);
+                } else {
+                    console.log(`Child link not added at linkscrape. ChildLink: ${scrapedLink.href}.`);
                 }
             });
-            resolve(sameDomainParsedUrlsMap);
+            resolve(childUrlSet);
         });
     });
 }

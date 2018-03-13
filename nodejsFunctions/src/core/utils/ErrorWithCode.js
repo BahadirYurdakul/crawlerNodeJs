@@ -1,6 +1,6 @@
 //@flow
 
-export default class CustomError extends Error {
+export default class ErrorWithCode extends Error {
     code : number;
 
     constructor(errMessage: string, code : number) {

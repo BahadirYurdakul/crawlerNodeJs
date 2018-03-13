@@ -2,33 +2,36 @@
 
 import {parseJSON} from "../core/helpers/JsonHelper";
 import {UrlHelper} from "../core/helpers/UrlHelper";
-import {CustomUrlModel} from "../core/utils/CustomUrlModel";
 import {crawlService} from "../services/CrawlService";
-import {CustomErrorCodes} from "../core/utils/CustomErrorCodes";
+import {ErrorCodes} from "../core/utils/ErrorCodes";
+import ErrorWithCode from "../core/utils/ErrorWithCode";
 
 export function crawler(event: Object, callback: Function) {
-    const data = Buffer.from(event.data.data, 'base64').toString();
-    let customUrl: CustomUrlModel;
     try {
-        let parsedData = parseJSON(data);
-        let url = checkUrlStringExist(parsedData['url']);
-        const parentParsedUrl = UrlHelper.parseParentUrl(url);
-        customUrl = new CustomUrlModel(parentParsedUrl);
-        console.log("Custom url extracted. custom url: " + JSON.stringify(customUrl));
+        if (!event.data) {
+            console.error(`Request body cannot be null`);
+            callback();
+            return;
+        }
+        const data = Buffer.from(event.data.data, 'base64').toString();
+        const parsedData = parseJSON(data);
+        const url = checkUrlStringExist(parsedData['url']);
+        const parentParsedUrl = UrlHelper.parseUrl(url);
+        if (UrlHelper.isUrlValid(parentParsedUrl)) {
+            throw new ErrorWithCode(`Parent url is not valid to request. 
+                Parent link: ${parentParsedUrl.protocolPlusHostPlusPath}`, ErrorCodes.parentUrlNotValid);
+        }
+        console.log(`Parsing url success. Parsed url: ${JSON.stringify(parentParsedUrl)}`);
+        //Call Service Layer
+        return crawlService(parentParsedUrl)
+            .then(() => callback())
+            .catch(err => callback(`Error in url: ${JSON.stringify(parentParsedUrl.protocolPlusHostPlusPath)} 
+                . Err: ${err}`));
     } catch (err) {
         //Validation errors cannot be handled, so do not try again.
-        console.error("Error while validation. Err: " + err);
+        console.error(`Error while validation. Err: ${JSON.stringify(err)}`);
         callback();
-        return;
     }
-
-    //Calling Services
-    return crawlService(customUrl)
-        .then(() => callback())
-        .catch(err => {
-            //console.error(`Callback with error: ${err}`);
-            callback(`Callback with error: ${err}`);
-        });
 }
 
 function checkUrlStringExist(url: string) {

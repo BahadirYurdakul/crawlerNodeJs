@@ -10,8 +10,8 @@ class CloudStorageClient {
         this.storage = new Storage();
     }
 
-    uploadData(path : string, bucketName : string) {
-        let fullPath = "/tmp/" + path;
+    uploadData(path : string, bucketName : string): Promise<any> {
+        const fullPath = "/tmp/" + path;
         return this.storage
             .bucket(bucketName)
             .upload(fullPath)

@@ -20,7 +20,7 @@ class ZipClient {
         this.zip = new JSZip();
     }
 
-    deleteLocalFile(encodedPath : string) {
+    deleteLocalFile(encodedPath: string) {
         let tempFilePath = "/tmp/" + encodedPath;
         return fs.unlink(tempFilePath, function (err) {
             if (err) {
@@ -35,7 +35,7 @@ class ZipClient {
         });
     }
 
-    zipFile(encodedPath : string, content : string) {
+    zipFile(encodedPath: string, content: string) {
         this.zip.file(encodedPath + ".txt", content);
         return this.zip.generateAsync(zipOptions)
             .catch(err => {
@@ -46,7 +46,7 @@ class ZipClient {
             });
     }
 
-    writeFileToLocalStorage(encodedPath : string, content : Object) : Promise<*> {
+    writeFileToLocalStorage(encodedPath: string, content: Object) : Promise<*> {
         let tempFilePath = "/tmp/" + encodedPath;
         return new Promise((resolve,reject) => {
             let file = fs.createWriteStream(tempFilePath);
